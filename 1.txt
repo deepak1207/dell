@@ -1,0 +1,235 @@
+make this entire story with charaters and dialogs
+
+high-converting thumbnail text ideas + a powerful intro hook
+
+----------prompt----------------
+a frame with one center circle with God laxmi with human who do business make different
+ cirlce around the center circle circles 
+with different business images 
+"2. ఫైనాన్స్ / డబ్బు / ట్రేడింగ్ బిజినెస్,3. విద్య / టీచింగ్ / కోచింగ్,4. సేల్స్ / మార్కెటింగ్ / బిజినెస్ గ్రోత్,
+5. టెక్నికల్ / ఇంజనీరింగ్ / కన్‌స్ట్రక్షన్,6. ఫుడ్ / హోటల్ / క్యాటరింగ్, 7. ట్రాన్స్‌పోర్ట్ / ట్రావెల్,8. మెడికల్ / హెల్త్"
+
+___________________________code------------------------------
+!unzip "Noto_Serif_Telugu.zip" -d font
+!pip install gtts
+pip install moviepy opencv-python Pillow numpy
+!pip install moviepy
+------------------------------------------------------------
+import cv2
+import numpy as np
+import os
+from gtts import gTTS
+from PIL import Image, ImageFont, ImageDraw
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
+import textwrap # Import the textwrap module
+# --- Configuration ---
+OUTPUT_FOLDER = "stotra_video_output"
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+TEMP_FOLDER = os.path.join(OUTPUT_FOLDER, "temp")
+os.makedirs(TEMP_FOLDER, exist_ok=True)
+# Define media paths
+telugu_font_path = "font/static/NotoSerifTelugu-Regular.ttf"
+image_d1 = "vya.png"
+image_d2 = "title.jpg"
+# --- Story Content (Telugu Script) ---
+
+    #1
+story_parts = [
+    {
+        "title": "The Vedansh Devotional channel",
+        "text": [
+            "Welcome to My channel viewers ",
+
+        ],
+        "image": image_d2
+    },
+
+    {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "1. లక్ష్మి గాయత్రి (సంపద & లాభం):-",
+            "మంత్రం:ఓం మహాలక్ష్మ్యై విధ్మహే  విష్ణుపత్న్యై ధీమహి  తన్నో లక్ష్మి ప్రచోదయాత్",
+            "Purpose:వ్యాపార లాభం, డబ్బు, అదృష్టం కోసం"
+
+        ],
+        "image": image_d1
+    },
+
+    {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "2. గణేశ గాయత్రి (అడ్డంకులు తొలగించడానికి):-",
+            "మంత్రం:ఓం ఏకదంతాయ విధ్మహే  వక్రతుండాయ ధీమహి  తన్నో దంతిః ప్రచోదయాత్",
+            "Purpose:కొత్త business ప్రారంభం, సమస్యలు తొలగించడానికి"
+        ],
+        "image": image_d1
+        },
+         {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "3. విష్ణు గాయత్రి (స్థిరత్వం & విజయం):-",
+            "మంత్రం:ఓం నారాయణాయ విధ్మహే  వాసుదేవాయ ధీమహి  తన్నో విష్ణుః ప్రచోదయాత్",
+            "Purpose: business growth & stability కోసం"
+        ],
+        "image": image_d1
+        },
+    {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "4. దుర్గ గాయత్రి (రక్షణ & పోటీపై విజయం):-",
+            "మంత్రం:ఓం కాత్యాయనాయ విధ్మహే  కన్యాకుమారి ధీమహి  తన్నో దుర్గః ప్రచోదయాత్",
+            "Purpose:competitors పై గెలవడానికి, నెగటివ్ ఎనర్జీ తొలగించడానికి"
+        ],
+        "image": image_d1
+        },
+    {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "5. సూర్య గాయత్రి (శక్తి & నిర్ణయం):-",
+            "మంత్రం:ఓం భాస్కరాయ విధ్మహే  మహాద్యుతికరాయ ధీమహి  తన్నో ఆదిత్యః ప్రచోదయాత్",
+            "Purpose:leadership, clarity, decision-making కోసం"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "ముఖ్యంగా (Best for all business):Gayatri Mantra",
+            "మంత్రం:ఓం భూర్భువః స్వః  తత్ సవితుర్ వరేణ్యం",
+            "భర్గో దేవస్య ధీమహి  ధియో యో నః ప్రచోదయాత్",
+            "Purpose:అన్ని పనులకు, విజయం, జ్ఞానం కోసం"
+        ],
+        "image": image_d1
+    },
+    #9
+    {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "జపం ఎలా చేయాలి (Business Growth Routine):",
+            "ఉదయం షాప్/ఆఫీస్ ఓపెన్ చేసే ముందు",
+            "గణేశ మంత్రం → 11 సార్లు"
+
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు",
+        "text": [
+            "జపం ఎలా చేయాలి (Business Growth Routine):",
+            "లక్ష్మి మంత్రం → 27 సార్లు",
+            "గాయత్రి మంత్రం → 108 సార్లు",
+            "శుభ్రత & దీపం వెలిగించడం మంచిది."
+
+        ],
+        "image": image_d1
+    }
+]
+    # --- Video Generation Functions ---
+width, height = 1920, 1080
+fps = 24
+
+def create_frame(title, subtitle, image_path):
+    """Creates a single video frame with text and image."""
+    img = Image.new('RGB', (width, height), color='black')
+    draw = ImageDraw.Draw(img)
+#font
+    try:
+        font_size_title = 70
+        font_size_subtitle = 30
+        title_font = ImageFont.truetype(telugu_font_path, font_size_title)
+        subtitle_font = ImageFont.truetype(telugu_font_path, font_size_subtitle)
+    except IOError:
+        print("Warning: Font file not found. Using default font.")
+        title_font = ImageFont.load_default()
+        subtitle_font = ImageFont.load_default()
+
+    if os.path.exists(image_path):
+        bg_image = Image.open(image_path).resize((int(width * 0.7), int(height * 0.7)), Image.LANCZOS)
+        img.paste(bg_image, ((width - bg_image.width) // 2, (height - bg_image.height) // 2))
+
+    if title:
+        draw.text((width // 2, 50), title, font=title_font, fill='gold', anchor="mt")
+
+    y_text = height - 200
+    # Wrap text and draw each line
+    max_width = width - 200 # Adjust this value as needed for padding
+    wrapped_lines = []
+    for line in subtitle:
+        wrapped_lines.extend(textwrap.wrap(line, width=int(max_width / (font_size_subtitle * 0.6)))) # Adjust width based on font size and cast to integer
+#change
+    for line in wrapped_lines:
+        draw.text((width // 2, y_text), line, font=subtitle_font, fill='green', anchor="mt")
+        y_text += 60 # Adjust line spacing as needed
+
+    return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+
+def create_scene_video(scene_data, scene_index):
+    """Creates a video clip for a single scene with synchronized audio."""
+    voiceover_text = " ".join(scene_data["text"])
+    audio_path = os.path.join(TEMP_FOLDER, f"scene_{scene_index}.mp3")
+
+    if "Aparajita devia namaha" in voiceover_text:
+        tts = gTTS(text=voiceover_text, lang='hi')
+    else:
+        tts = gTTS(text=voiceover_text, lang='te')
+
+    tts.save(audio_path)
+
+    audio_clip = AudioFileClip(audio_path)
+    audio_duration = audio_clip.duration
+
+    video_path = os.path.join(TEMP_FOLDER, f"scene_{scene_index}వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు.mp4")
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(video_path, fourcc, fps, (width, height))
+
+    num_frames = int(audio_duration * fps)
+
+    for _ in range(num_frames):
+        frame = create_frame(scene_data["title"], scene_data["text"], scene_data["image"])
+        out.write(frame)
+
+    out.release()
+    audio_clip.close()
+
+    print(f"Created video for Scene {scene_index} with duration {audio_duration:.2f} seconds.")
+
+    return video_path, audio_path
+
+# --- Main Program Execution ---
+if __name__ == "__main__":
+    print("Starting video creation process...")
+
+    video_clips = []
+
+    for i, scene in enumerate(story_parts):
+        try:
+            video_path, audio_path = create_scene_video(scene, i)
+            video_clip = VideoFileClip(video_path).set_audio(AudioFileClip(audio_path))
+            video_clips.append(video_clip)
+
+        except Exception as e:
+            print(f"An error occurred while processing scene {i}: {e}")
+            continue
+
+    if video_clips:
+        print("\nCombining all scenes into a final video...")
+        final_video = concatenate_videoclips(video_clips)
+
+        final_output_path = os.path.join(OUTPUT_FOLDER, "వ్యాపారం (Business) కోసం గాయత్రి మంత్రాలు.mp4")
+
+        final_video.write_videofile(final_output_path, codec="libx264", audio_codec="aac")
+
+        print(f"\n✅ Video created successfully at: {final_output_path}")
+
+    else:
+        print("\n❌ No video clips were created. Exiting.")
+
+    import shutil
+    shutil.rmtree(TEMP_FOLDER)
+    print("Temporary files have been cleaned up.")
+
+    try:
+        from google.colab import files
+        files.download(final_output_path)
+    except ImportError:
+        print("\nNote: The 'google.colab' library is not available. You can find your video file in the 'stotra_video_output' folder on the left-hand side file explorer.")

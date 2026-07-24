@@ -1,0 +1,424 @@
+!pip install gtts
+
+import cv2
+import numpy as np
+import os
+from gtts import gTTS
+from PIL import Image, ImageFont, ImageDraw
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
+import textwrap # Import the textwrap module
+
+# --- Configuration ---
+OUTPUT_FOLDER = "stotra_video_output"
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+TEMP_FOLDER = os.path.join(OUTPUT_FOLDER, "temp")
+os.makedirs(TEMP_FOLDER, exist_ok=True)
+# Define media paths
+telugu_font_path = "font/static/NotoSerifTelugu-Regular.ttf"
+image_d1 = "aditya.png"
+
+# --- Story Content (Telugu Script) ---
+story_parts = [
+    {
+        "title": " ఆదిత్యహృదయం",
+        "text": [
+            "శ్రీ గణేశాయ నమః",
+            "తతో యుద్ధ పరిశ్రాంతం సమరే చింతయా స్థితమ్ ।",
+            "రావణం చాగ్రతో దృష్ట్వా యుద్ధాయ సముపస్థితమ్ ॥ "
+        ],
+        "image": image_d1
+    },
+    #1
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "దైవతైశ్చ సమాగమ్య ద్రష్టుమభ్యాగతో రణమ్ ।",
+            "ఉపగమ్యాబ్రవీద్రామం అగస్త్యో భగవాన్ ఋషిః ॥ "
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "రామ రామ మహాబాహో శృణు గుహ్యం సనాతనమ్ । ",
+            "యేన సర్వానరీన్ వత్స సమరే విజయిష్యసి ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఆదిత్యహృదయం పుణ్యం సర్వశత్రువినాశనమ్ । ",
+            "జయావహం జపం నిత్యం అక్షయం పరమం శివమ్ ॥ "
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "సర్వమంగళ మాంగల్యం సర్వపాప ప్రణాశనమ్ ।",
+            "చింతాశోక ప్రశమనం ఆయుర్వర్ధనముత్తమమ్ ॥ 5 ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "రశ్మిమంతం సముద్యంతం దేవాసుర నమస్కృతమ్ । ",
+            "పూజయస్వ వివస్వంతం భాస్కరం భువనేశ్వరమ్ ॥ "
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "సర్వదేవాత్మకో హ్యేష తేజస్వీ రశ్మిభావనః ।",
+            "ఏష దేవాసుర గణాన్ లోకాన్ పాతి గభస్తిభిః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఏష బ్రహ్మా చ విష్ణుశ్చ శివః స్కందః ప్రజాపతిః ।",
+            "మహేంద్రో ధనదః కాలో యమః సోమో హ్యపాంపతిః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "పితరో వసవః సాధ్యా హ్యశ్వినౌ మరుతో మనుః ।",
+            "వాయురగ్నిః ప్రజాప్రాణ ఋతుకర్తా ప్రభాకరః ॥ "
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఆదిత్యః సవితా సూర్యః ఖగః పూషా గభస్తిమాన్ ।",
+            "సువర్ణసదృశో భానుః హిరణ్యరేతా దివాకరః ॥"
+        ],
+        "image": image_d1
+    },
+    #11
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "హరిదశ్వః సహస్రార్చిః సప్తసప్తిర్ మరీచిమాన్ । ",
+            "తిమిరోన్మథనః శంభుః త్వష్టా మార్తాండ అంశుమాన్ ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "హిరణ్యగర్భః శిశిరః తపనో భాస్కరో రవిః ।",
+            "అగ్నిగర్భోఽదితేః పుత్రః శంఖః శిశిరనాశనః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "వ్యోమనాథః తమోభేదీ ఋగ్యజుః సామపారగః ।",
+            "ఘనవృష్టిరపాం మిత్రో వింధ్యవీథీ ప్లవంగమః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఆతపీమండలీ మృత్యుః పింగళః సర్వతాపనః ।",
+            "కవిర్విశ్వో మహాతేజా రక్తః సర్వభవోద్భవః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "నక్షత్రగ్రహతారాణాం అధిపో విశ్వభావనః ।",
+            "తేజసామపి తేజస్వీ ద్వాదశాత్మన్నమోఽస్తు తే ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "నమః పూర్వాయ గిరయే పశ్చిమాయాద్రయే నమః ।",
+            "జ్యోతిర్గణానాం పతయే దినాధిపతయే నమః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "జయాయ జయభద్రాయ హర్యశ్వాయ నమో నమః ।",
+            "నమో నమః సహస్రాంశో ఆదిత్యాయ నమో నమః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "నమ ఉగ్రాయ వీరాయ సారంగాయ నమో నమః ।",
+            "నమః పద్మప్రబోధాయ మార్తాండాయ నమో నమః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "బ్రహ్మేశానాచ్యుతేశాయ సూర్యాయాదిత్యవర్చసే ।",
+            "భాస్వతే సర్వభక్షాయ రౌద్రాయ వపుషే నమః ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "తమోఘ్నాయ హిమఘ్నాయ శత్రుఘ్నాయామితాత్మనే ।",
+            "కృతఘ్నఘ్నాయ దేవాయ జ్యోతిషాం పతయే నమః ॥"
+        ],
+        "image": image_d1
+    },
+    #21
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "తప్తచామీకరాభాయ వహ్నయే విశ్వకర్మణే ।",
+            "నమస్తమోఽభినిఘ్నాయ రుచయే లోకసాక్షిణే ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "నాశయత్యేష వై భూతం తదేవ సృజతి ప్రభుః ।",
+            "పాయత్యేష తపత్యేష వర్షత్యేష గభస్తిభిః ॥"
+        ],
+        "image": image_d1
+    },
+    #23
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఏష సుప్తేషు జాగర్తి భూతేషు పరిణిష్ఠితః ।",
+            "ఏష ఏవాగ్నిహోత్రం చ ఫలం చైవాగ్నిహోత్రిణామ్ ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "వేదాశ్చ క్రతవశ్చైవ క్రతూనాం ఫలమే చ యత్ ।",
+            "యానీ కృత్యాని లోకేషు సర్వ ఏష రవి ప్రభుః ॥"
+        ],
+        "image": image_d1
+    },
+    #25
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఫలశ్రుతి:",
+            "ఏనం ఆపత్సు కృచ్ఛ్రేషు కాంతారేషు భయేషు చ ।",
+            "కీర్తయన్ పురుషః కశ్చిన్నావసీదతి రాఘవ ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "పూజయస్వైనమేకాగ్రో దేవదేవం జగత్పతిమ్ ।",
+            "ఏతత్ త్రిగుణితం జప్త్వా యుద్ధేషు విజయిష్యసి ॥"
+        ],
+        "image": image_d1
+    },
+    #27
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "అస్మిన్ క్షణే మహాబాహో రావణం త్వం వధిష్యసి ।",
+            "ఏవముక్త్వా తదాగస్త్యో జగామ చ యథాగతమ్ ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఏతచ్చ్రుత్వా మహాతేజా నష్టశోకోఽభవత్తదా ।",
+            "ధారయామాస సుప్రీతో రాఘవః ప్రయతాత్మవాన్ ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఆదిత్యం ప్రేక్ష్య జప్త్వా తు పరంహర్షమవాప్తవాన్ ।",
+            "త్రిరాచమ్య శుచిర్భూత్వా ధనురాదాయ వీర్యవాన్ ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "రావణం ప్రేక్ష్య హృష్టాత్మా యుద్ధాయ సముపాగమత్ ।",
+            "సర్వయత్నేన మహతా వధే తస్య ధృతోఽభవత్ ॥"
+        ],
+        "image": image_d1
+    },
+    #31
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "అథ రవిరవదన్నిరీక్ష్య రామం ముదితమనాః పరమం ప్రహృష్యమాణః ।",
+            "నిశిచరపతిసంహతిం విదిత్వా సురగణమధ్యగతో వచస్త్వరేణ ॥"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "యుద్ధంలో అలసిపోయి, మనసులో సందేహాలతో ఉన్న శ్రీరాముడిని చూసి",
+            "అగస్త్య మహర్షి ఆయనకు ఒక మహాశక్తివంతమైన స్తోత్రాన్ని ఉపదేశిస్తారు.",
+            "అదే ఆదిత్యహృదయం."
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఆదిత్యుడు అంటే కేవలం గ్రహం కాదు.ఆయన—",
+            "సృష్టికి మూలమైన బ్రహ్మ-లోకాన్ని పోషించే విష్ణువు-అజ్ఞానాన్ని నశింపజేసే శివుడు",
+            "కాలస్వరూపం-వేదాలు, యజ్ఞాలు, కర్మల ఫలాలు అన్నీ ఆయనే.",
+            "సూర్యుడు లేకపోతే—> జీవితం లేదు-కాలం లేదు-కర్మ ఫలం లేదు"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "ఈ స్తోత్రం జపం చేస్తే:శత్రువులు (బయటి + లోపలి) నశిస్తారు,భయం, ఆందోళన, డిప్రెషన్ తగ్గుతుంది-",
+            "ధైర్యం, ఆత్మవిశ్వాసం పెరుగుతుంది-ఆరోగ్యం, ఆయుష్షు వృద్ధి అవుతుంది-జీవితంలో విజయం లభిస్తుంది"
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "ఆదిత్యహృదయం",
+        "text": [
+            "రాముడు —సూర్యుని ధ్యానం చేసి-తన దుఃఖాన్ని విడిచిపెట్టి-అపార ధైర్యంతో యుద్ధానికి వెళ్లి రావణుడిని సంహరించాడు",
+            "బలహీనత మనసులోనే ఉంటుంది.  దైవస్మరణతో అది శక్తిగా మారుతుంది."
+        ],
+        "image": image_d1
+    }
+]
+    # --- Video Generation Functions ---
+width, height = 1920, 1080
+fps = 24
+
+def create_frame(title, subtitle, image_path):
+    """Creates a single video frame with text and image."""
+    img = Image.new('RGB', (width, height), color='black')
+    draw = ImageDraw.Draw(img)
+
+    try:
+        font_size_title = 70
+        font_size_subtitle = 40
+        title_font = ImageFont.truetype(telugu_font_path, font_size_title)
+        subtitle_font = ImageFont.truetype(telugu_font_path, font_size_subtitle)
+    except IOError:
+        print("Warning: Font file not found. Using default font.")
+        title_font = ImageFont.load_default()
+        subtitle_font = ImageFont.load_default()
+
+    if os.path.exists(image_path):
+        bg_image = Image.open(image_path).resize((int(width * 0.7), int(height * 0.7)), Image.LANCZOS)
+        img.paste(bg_image, ((width - bg_image.width) // 2, (height - bg_image.height) // 2))
+
+    if title:
+        draw.text((width // 2, 50), title, font=title_font, fill='gold', anchor="mt")
+
+    y_text = height - 200
+    # Wrap text and draw each line
+    max_width = width - 200 # Adjust this value as needed for padding
+    wrapped_lines = []
+    for line in subtitle:
+        wrapped_lines.extend(textwrap.wrap(line, width=int(max_width / (font_size_subtitle * 0.6)))) # Adjust width based on font size and cast to integer
+
+    for line in wrapped_lines:
+        draw.text((width // 2, y_text), line, font=subtitle_font, fill='white', anchor="mt")
+        y_text += 60 # Adjust line spacing as needed
+
+    return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+
+def create_scene_video(scene_data, scene_index):
+    """Creates a video clip for a single scene with synchronized audio."""
+    voiceover_text = " ".join(scene_data["text"])
+    audio_path = os.path.join(TEMP_FOLDER, f"scene_{scene_index}.mp3")
+
+    if "Aparajita devia namaha" in voiceover_text:
+        tts = gTTS(text=voiceover_text, lang='hi')
+    else:
+        tts = gTTS(text=voiceover_text, lang='te')
+
+    tts.save(audio_path)
+
+    audio_clip = AudioFileClip(audio_path)
+    audio_duration = audio_clip.duration
+
+    video_path = os.path.join(TEMP_FOLDER, f"scene_{scene_index}ఆదిత్యహృదయం.mp4")
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(video_path, fourcc, fps, (width, height))
+
+    num_frames = int(audio_duration * fps)
+
+    for _ in range(num_frames):
+        frame = create_frame(scene_data["title"], scene_data["text"], scene_data["image"])
+        out.write(frame)
+
+    out.release()
+    audio_clip.close()
+
+    print(f"Created video for Scene {scene_index} with duration {audio_duration:.2f} seconds.")
+
+    return video_path, audio_path
+
+# --- Main Program Execution ---
+if __name__ == "__main__":
+    print("Starting video creation process...")
+
+    video_clips = []
+
+    for i, scene in enumerate(story_parts):
+        try:
+            video_path, audio_path = create_scene_video(scene, i)
+            video_clip = VideoFileClip(video_path).set_audio(AudioFileClip(audio_path))
+            video_clips.append(video_clip)
+
+        except Exception as e:
+            print(f"An error occurred while processing scene {i}: {e}")
+            continue
+
+    if video_clips:
+        print("\nCombining all scenes into a final video...")
+        final_video = concatenate_videoclips(video_clips)
+
+        # Define the output path in Google Drive
+        output_filename = "ఆదిత్యహృదయం.mp4"
+        drive_output_path = os.path.join("/content/drive/MyDrive/", OUTPUT_FOLDER, output_filename)
+
+        # Ensure the Google Drive output directory exists
+        os.makedirs(os.path.dirname(drive_output_path), exist_ok=True)
+
+        final_video.write_videofile(drive_output_path, codec="libx264", audio_codec="aac")
+
+        print(f"\n✅ Video created successfully at: {drive_output_path}")
+
+    else:
+        print("\n❌ No video clips were created. Exiting.")
+
+    import shutil
+    shutil.rmtree(TEMP_FOLDER)
+    print("Temporary files have been cleaned up.")
+
+    print("\nNote: The 'google.colab' library is not available. You can find your video file in the 'stotra_video_output' folder on the left-hand side file explorer.")

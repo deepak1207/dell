@@ -1,0 +1,408 @@
+import cv2
+import numpy as np
+import os
+from gtts import gTTS
+from PIL import Image, ImageFont, ImageDraw
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
+import textwrap
+OUTPUT_FOLDER = "stotra_video_output"
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+TEMP_FOLDER = os.path.join(OUTPUT_FOLDER, "temp")
+os.makedirs(TEMP_FOLDER, exist_ok=True)
+telugu_font_path = "font/static/NotoSerifTelugu-Regular.ttf"
+image_d1 = "pol.png"
+image_d2 = "title.jpg"
+image_d3 = "poleru-na.png"
+image_d4 = "poleru_dev.png"
+image_d5 = "poleru_gram.png"
+image_d6 = "poleru.png"
+image_d7 = "poleru-ramayaa.png"
+image_d8 = "poleru-laxmama.png"
+image_d9 = "poleru-pooja.png"
+image_d10 = "poleru-roga.png"
+image_d11 = "poleru-nd.png"
+image_d12 = "poleru-fight.png"
+image_d13 = "poleru-godess.png"
+image_d14 = "poleru-gramasth.png"
+image_d15 = "poleru-gram(jai).png"
+story_parts = [
+    {
+        "title": "The Vedansh Devotional channel",
+        "text": [
+            "Welcome to My channel viewers ",
+
+        ],
+        "image": image_d2
+    },
+
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "గ్రామంలో కష్టాలు",
+            "వివరణకర్త:చాలా కాలం క్రితం నెల్లూరు ప్రాంతంలో ఒక గ్రామం ఉండేది.",
+            "ఆ గ్రామం మీద రోగాలు, భయాలు చుట్టుముట్టాయి."
+        ],
+        "image": image_d3
+    },
+
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "గ్రామంలో కష్టాలు",
+            "రామయ్య:“అయ్యో! రోజుకో కొత్త వ్యాధి వస్తోంది… ఏమి చేయాలో అర్థం కావడం లేదు!” "
+        ],
+        "image": image_d7
+        },
+         {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "గ్రామంలో కష్టాలు",
+            "లక్ష్మమ్మ: “పిల్లలు కూడా బాగా లేరు… ఎవరు మమ్మల్ని కాపాడతారు?” "
+        ],
+        "image": image_d8
+        },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "గ్రామంలో కష్టాలు",
+            "పెద్దయ్య: “ఇది సహజం కాదు… ఏదో చెడు శక్తి మన గ్రామాన్ని పట్టుకుంది.” "
+        ],
+        "image": image_d5
+        },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "రాక్షసి ప్రవేశం",
+            "రోగ రాక్షసి: “హాహాహా! ఈ గ్రామం ఇక నా అధీనంలో ఉంది… అందరికీ రోగాలు పుట్టిస్తాను!” "
+        ],
+        "image": image_d10
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "రాక్షసి ప్రవేశం",
+            "గ్రామస్థులు: “అయ్యో దేవుడా! మమ్మల్ని కాపాడండి!” "
+        ],
+        "image": image_d14
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "పోలేరమ్మకు ప్రార్థన",
+            "పెద్దయ్య: “మనకు ఒకటే మార్గం… పోలేరమ్మ తల్లిని ప్రార్థిద్దాం!” "
+        ],
+        "image": image_d5
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "పోలేరమ్మకు ప్రార్థన",
+            "పూజారి: “అవును, పోలేరమ్మ తల్లి గ్రామ దేవత. ఆమె మనల్ని కాపాడుతుంది.” "
+
+        ],
+        "image": image_d9
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "పోలేరమ్మకు ప్రార్థన",
+            "గ్రామస్థులు: “అమ్మ పోలేరమ్మ… మమ్మల్ని కాపాడమ్మా!” "
+
+        ],
+        "image": image_d14
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "పోలేరమ్మ అవతారం (దివ్య కాంతి వెలుగుతుంది)",
+            "పోలేరమ్మ తల్లి: “నా పిల్లలారా… భయపడకండి. నేను మీతోనే ఉన్నాను.” "
+
+        ],
+        "image": image_d4
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "పోలేరమ్మ అవతారం (దివ్య కాంతి వెలుగుతుంది)",
+            "గ్రామస్థులు: “అమ్మా! ఈ రాక్షసి నుంచి మమ్మల్ని రక్షించు!” "
+
+        ],
+        "image": image_d14
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "పోలేరమ్మ అవతారం (దివ్య కాంతి వెలుగుతుంది)",
+            "పోలేరమ్మ తల్లి: “అమ్మా! ఈ రాక్షసి నుంచి మమ్మల్ని రక్షించు!” "
+
+        ],
+        "image": image_d4
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "యుద్ధం",
+            "రోగ రాక్షసి: “నువ్వెవరు నన్ను ఎదిరించడానికి?” "
+
+        ],
+        "image": image_d10
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "యుద్ధం",
+            "పోలేరమ్మ తల్లి: “నేను ఈ గ్రామ రక్షకురాలిని. నీ అంతం ఇదే రోజు!”    (యుద్ధం జరుగుతుంది) "
+
+        ],
+        "image": image_d4
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "యుద్ధం",
+            "రోగ రాక్షసి: “అయ్యో! నేను ఓడిపోతున్నాను!” "
+
+        ],
+        "image": image_d10
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "యుద్ధం",
+            "పోలేరమ్మ తల్లి: “చెడు మీద మంచి ఎప్పుడూ గెలుస్తుంది!” "
+
+        ],
+        "image": image_d14
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "విజయము",
+            "వివరణకర్త: పోలేరమ్మ తల్లి రాక్షసిని సంహరించి గ్రామాన్ని రక్షించింది. "
+
+        ],
+        "image": image_d3
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "విజయము",
+            "గ్రామస్థులు: “జై పోలేరమ్మ తల్లి!” "
+
+        ],
+        "image": image_d15
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "వి విజయము",
+            "పోలేరమ్మ తల్లి: “ప్రతి సంవత్సరం నా జాతరను జరపండి. నేను ఎప్పుడూ మీకు రక్షణగా ఉంటాను.” "
+
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "జాతర ప్రారంభం",
+            "వివరణకర్త: అప్పటి నుండి ప్రతి సంవత్సరం పోలేరమ్మ జాతరను ఘనంగా జరుపుకుంటున్నారు. "
+
+        ],
+        "image": image_d1
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "జాతర ప్రారంభం",
+            "గ్రామస్థులు: “అమ్మా, ప్రతి సంవత్సరం నీ జాతరను భక్తితో జరుపుతాం!”. "
+
+        ],
+        "image": image_d14
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "ముగింపు",
+            "వివరణకర్త:ఈరోజు కూడా నెల్లూరులో పోలేరమ్మ జాతర ఎంతో భక్తి, ఉత్సాహంతో జరుగుతుంది.",
+            "పోలేరమ్మ తల్లి గ్రామాలను రోగాల నుంచి కాపాడుతుందని ప్రజల విశ్వాసం."
+
+        ],
+        "image": image_d11
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "వివరణకర్త (Fast Voice): “నెల్లూరులో ఒకప్పుడు గ్రామం మొత్తం రోగాలతో బాధపడుతోంది…” "
+
+        ],
+        "image": image_d3
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "రాక్షసి: “ఈ గ్రామం ఇప్పుడు నాది… అందరూ బాధపడాలి!” "
+
+        ],
+        "image": image_d10
+    },
+{
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "గ్రామస్థులు: “అమ్మ పోలేరమ్మ… మమ్మల్ని కాపాడమ్మా!” "
+
+        ],
+        "image": image_d14
+    },
+{
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "(దివ్య ఎఫెక్ట్) పోలేరమ్మ తల్లి: “అమ్మ పోలేరమ్మ… మమ్మల్ని కాపాడమ్మా!” "
+
+        ],
+        "image": image_d4
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "(ఫైట్ సీన్) ",
+            "“అయ్యో! నేను ఓడిపోతున్నాను!”"
+
+        ],
+        "image": image_d12
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "(ఫైట్ సీన్) ",
+            "“చెడు మీద మంచి ఎప్పుడూ గెలుస్తుంది!”"
+
+        ],
+        "image": image_d13
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "వివరణకర్త: “అలా పోలేరమ్మ తల్లి గ్రామాన్ని కాపాడింది… అప్పటి నుండి ప్రతి సంవత్సరం జాతర జరుపుతున్నారు!” "
+
+        ],
+        "image": image_d3
+    },
+    {
+        "title": "Nellore Poleramma Jatara",
+        "text": [
+            "1-Minute Shorts Script",
+            "ఎండ్ స్క్రీన్: “జై పోలేరమ్మ తల్లి” "
+
+        ],
+        "image": image_d15
+    },
+]
+width, height = 1920, 1080
+fps = 24
+
+def create_frame(title, subtitle, image_path):
+    img = Image.new('RGB', (width, height), color='black')
+    draw = ImageDraw.Draw(img)
+    try:
+        font_size_title = 70
+        font_size_subtitle = 30
+        title_font = ImageFont.truetype(telugu_font_path, font_size_title)
+        subtitle_font = ImageFont.truetype(telugu_font_path, font_size_subtitle)
+    except IOError:
+        print("Warning: Font file not found. Using default font.")
+        title_font = ImageFont.load_default()
+        subtitle_font = ImageFont.load_default()
+
+    if os.path.exists(image_path):
+        bg_image = Image.open(image_path).resize((int(width * 0.7), int(height * 0.7)), Image.LANCZOS)
+        img.paste(bg_image, ((width - bg_image.width) // 2, (height - bg_image.height) // 2))
+
+    if title:
+        draw.text((width // 2, 50), title, font=title_font, fill='gold', anchor="mt")
+
+    y_text = height - 200
+    max_width = width - 200
+    wrapped_lines = []
+    for line in subtitle:
+        wrapped_lines.extend(textwrap.wrap(line, width=int(max_width / (font_size_subtitle * 0.6))))
+    for line in wrapped_lines:
+        draw.text((width // 2, y_text), line, font=subtitle_font, fill='green', anchor="mt")
+        y_text += 60
+
+    return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+
+def create_scene_video(scene_data, scene_index):
+    voiceover_text = " ".join(scene_data["text"])
+    audio_path = os.path.join(TEMP_FOLDER, f"scene_{scene_index}.mp3")
+
+    if "Aparajita devia namaha" in voiceover_text:
+        tts = gTTS(text=voiceover_text, lang='hi')
+    else:
+        tts = gTTS(text=voiceover_text, lang='te')
+
+    tts.save(audio_path)
+
+    audio_clip = AudioFileClip(audio_path)
+    audio_duration = audio_clip.duration
+
+    video_path = os.path.join(TEMP_FOLDER, f"scene_{scene_index}Nellore Poleramma Jatara.mp4")
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(video_path, fourcc, fps, (width, height))
+
+    num_frames = int(audio_duration * fps)
+
+    for _ in range(num_frames):
+        frame = create_frame(scene_data["title"], scene_data["text"], scene_data["image"])
+        out.write(frame)
+
+    out.release()
+    audio_clip.close()
+
+    print(f"Created video for Scene {scene_index} with duration {audio_duration:.2f} seconds.")
+
+    return video_path, audio_path
+
+if __name__ == "__main__":
+    print("Starting video creation process...")
+
+    video_clips = []
+
+    for i, scene in enumerate(story_parts):
+        try:
+            video_path, audio_path = create_scene_video(scene, i)
+            video_clip = VideoFileClip(video_path).set_audio(AudioFileClip(audio_path))
+            video_clips.append(video_clip)
+
+        except Exception as e:
+            print(f"An error occurred while processing scene {i}: {e}")
+            continue
+
+    if video_clips:
+        print("\nCombining all scenes into a final video...")
+        final_video = concatenate_videoclips(video_clips)
+
+        final_output_path = os.path.join(OUTPUT_FOLDER, "Nellore Poleramma Jatara.mp4")
+
+        final_video.write_videofile(final_output_path, codec="white", audio_codec="aac")
+
+        print(f"\n✅ Video created successfully at: {final_output_path}")
+
+    else:
+        print("\n❌ No video clips were created. Exiting.")
+
+    import shutil
+    shutil.rmtree(TEMP_FOLDER)
+    print("Temporary files have been cleaned up.")
+
+    try:
+        from google.colab import files
+        files.download(final_output_path)
+    except ImportError:
+        print("\nNote: The 'google.colab' library is not available. You can find your video file in the 'stotra_video_output' folder on the left-hand side file explorer.")
